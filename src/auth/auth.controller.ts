@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 class SignInDto {
   @ApiProperty()
@@ -22,15 +23,22 @@ class SignInDto {
 
 export class SignUpDto {
   @ApiProperty()
+  @IsNotEmpty()
+  @MinLength(6)
   username: string;
 
   @ApiProperty()
+  @IsNotEmpty()
+  @MinLength(6)
   password: string;
 
   @ApiProperty()
+  @IsNotEmpty()
+  @MinLength(6)
   name: string;
 
   @ApiProperty()
+  @IsEmail()
   email: string;
 }
 
