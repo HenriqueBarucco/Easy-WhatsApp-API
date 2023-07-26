@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-//import { AppModule } from './app.module';
 import { AuthModule } from './auth/auth.module';
 
 import { version } from '../package.json';
@@ -17,6 +16,7 @@ async function bootstrap() {
       'contato@henriquebarucco.com.br',
     )
     .setVersion(version)
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
