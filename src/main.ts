@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
+//import { AppModule } from './app.module';
+import { AuthModule } from './auth/auth.module';
 
 import { version } from '../package.json';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AuthModule);
 
   const config = new DocumentBuilder()
     .setTitle('Easy WhatsApp Bot API')

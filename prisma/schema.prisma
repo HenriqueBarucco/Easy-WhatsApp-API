@@ -9,3 +9,14 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String @unique
+  name     String
+  password String
+
+  @@map("users_tbl")
+}
