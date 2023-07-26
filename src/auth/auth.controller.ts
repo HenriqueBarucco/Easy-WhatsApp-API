@@ -15,16 +15,17 @@ import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 class SignInDto {
   @ApiProperty()
+  @IsNotEmpty()
   username: string;
 
   @ApiProperty()
+  @IsNotEmpty()
   password: string;
 }
 
 export class SignUpDto {
   @ApiProperty()
   @IsNotEmpty()
-  @MinLength(6)
   username: string;
 
   @ApiProperty()
