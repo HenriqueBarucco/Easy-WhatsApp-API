@@ -1,6 +1,6 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { InstanceService } from './instance.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth()
@@ -10,8 +10,15 @@ import { AuthGuard } from '@nestjs/passport';
 export class InstanceController {
   constructor(private readonly instanceService: InstanceService) {}
 
-  @Get('/')
-  getInstance(@Request() req: any) {
-    return this.instanceService.getInstance(req.user.key);
+  @ApiOperation({ summary: '' })
+  @Get('init')
+  init(@Request() req: any) {
+    return this.instanceService.init(req.user.key);
+  }
+
+  @ApiOperation({ summary: 'Get QR Image as base64 string' })
+  @Get('qrbase64')
+  qrbase64(@Request() req: any) {
+    return this.instanceService.qrbase64(req.user.key);
   }
 }
