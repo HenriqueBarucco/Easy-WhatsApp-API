@@ -13,7 +13,7 @@ export class InstanceController {
   @ApiOperation({ summary: '' })
   @Get('init')
   init(@Request() req: any) {
-    return this.instanceService.init(req.user.key);
+    return this.instanceService.init(req.user);
   }
 
   @ApiOperation({ summary: 'Get QR Image as base64 string' })

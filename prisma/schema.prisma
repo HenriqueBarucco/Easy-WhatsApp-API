@@ -11,12 +11,21 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  email    String @unique
+  id       Int        @id @default(autoincrement())
+  username String     @unique
+  email    String     @unique
   name     String
   password String
-  key      String @unique @default(uuid())
+  key      String     @unique @default(uuid())
+  Instance Instance[]
 
   @@map("users_tbl")
+}
+
+model Instance {
+  id      String @id
+  ownerId Int
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  @@map("instances_tbl")
 }
