@@ -16,6 +16,8 @@ export class InstanceService {
     const instance = new WhatsAppInstance(key);
     const data = await instance.init();
 
+    console.log('data', data);
+
     this.instances.push(data);
   }
 
@@ -26,7 +28,11 @@ export class InstanceService {
       throw new NotFoundException('Instance not found');
     }
 
-    const qrcode = (await instance).instance.qr;
+    let qrcode = (await instance).instance.qr;
+
+    if (qrcode === '') {
+      qrcode = (await (await instance).init()).instance.qr;
+    }
 
     return {
       message: 'QR Base64 fetched successfully',
