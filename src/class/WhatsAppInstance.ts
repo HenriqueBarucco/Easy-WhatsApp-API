@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
@@ -81,5 +82,28 @@ export class WhatsAppInstance {
         });
       }
     });
+  }
+
+  getWhatsAppId(id: string) {
+    if (id.includes('@g.us') || id.includes('@s.whatsapp.net')) return id;
+    return id.includes('-') ? `${id}@g.us` : `${id}@s.whatsapp.net`;
+  }
+
+  async verifyId(id: string) {
+    if (id.includes('@g.us')) return true;
+    const [result] = await this.instance.sock?.onWhatsApp(id);
+    if (result?.exists) return true;
+    throw new NotFoundException('no account exists');
+  }
+
+  async sendTextMessage(phone: string, message: string) {
+    await this.verifyId(this.getWhatsAppId(phone));
+    const data = await this.instance.sock?.sendMessage(
+      this.getWhatsAppId(phone),
+      {
+        text: message,
+      },
+    );
+    return data;
   }
 }

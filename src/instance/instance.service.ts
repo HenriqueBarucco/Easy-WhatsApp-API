@@ -16,6 +16,7 @@ export class InstanceService {
     const instance = new WhatsAppInstance(key);
     const data = await instance.init();
 
+    console.log('instance', instance);
     console.log('data', data);
 
     this.instances.push(data);

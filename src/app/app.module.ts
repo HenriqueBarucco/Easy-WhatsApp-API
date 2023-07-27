@@ -5,10 +5,13 @@ import { InstanceController } from 'src/instance/instance.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { InstanceModule } from 'src/instance/instance.module';
 import { InstanceService } from 'src/instance/instance.service';
+import { MessageService } from 'src/message/message.service';
+import { MessageController } from 'src/message/message.controller';
+import { MessageModule } from 'src/message/message.module';
 
 @Module({
-  imports: [AuthModule, InstanceModule],
-  controllers: [AppController, InstanceController],
-  providers: [AppService, InstanceService],
+  imports: [AuthModule, InstanceModule, MessageModule],
+  controllers: [AppController, InstanceController, MessageController],
+  providers: [AppService, InstanceService, MessageService],
 })
 export class AppModule {}
