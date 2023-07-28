@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 
 import {
   ApiBearerAuth,
@@ -29,7 +37,21 @@ export class MessageController {
 
   @ApiOperation({ summary: 'Send text message' })
   @Post('text')
-  init(@Request() req: any, @Body() sendTextDto: SendTextDto) {
+  sendTextPost(@Request() req: any, @Body() sendTextDto: SendTextDto) {
+    return this.messageService.sendText(req.user.key, sendTextDto);
+  }
+
+  @ApiOperation({ summary: 'Send text message' })
+  @Get('text/:phone/:message')
+  sendTextGet(
+    @Request() req: any,
+    @Param('phone') phone: string,
+    @Param('message') message: string,
+  ) {
+    const sendTextDto = {
+      phone,
+      message,
+    };
     return this.messageService.sendText(req.user.key, sendTextDto);
   }
 }
