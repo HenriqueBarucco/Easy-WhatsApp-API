@@ -9,7 +9,25 @@ export class InstanceService {
   instances = [];
 
   getInstance(key: string): Promise<WhatsAppInstance | null> {
-    return this.instances.find((instance) => instance.instance.key === key);
+    const instance = this.instances.find(
+      (instance) => instance.instance.key === key,
+    );
+    return instance;
+  }
+
+  async restoreSessions(): Promise<void> {
+    const instances = await this.prisma.instance.findMany();
+    const promises = [];
+
+    instances.forEach((instance) => {
+      const restoreSessions = new WhatsAppInstance(instance.id);
+      const initPromise = restoreSessions.init();
+      promises.push(initPromise);
+    });
+
+    const initializedInstances = await Promise.all(promises);
+
+    this.instances.push(...initializedInstances);
   }
 
   async init(user: User): Promise<any> {

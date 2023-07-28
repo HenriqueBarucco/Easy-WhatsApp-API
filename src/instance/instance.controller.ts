@@ -10,7 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class InstanceController {
   constructor(private readonly instanceService: InstanceService) {}
 
-  @ApiOperation({ summary: '' })
+  @ApiOperation({ summary: 'Init your instance' })
   @Get('init')
   init(@Request() req: any) {
     return this.instanceService.init(req.user);

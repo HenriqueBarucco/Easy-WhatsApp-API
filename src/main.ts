@@ -4,6 +4,7 @@ import { AppModule } from './app/app.module';
 
 import { version } from '../package.json';
 import { ValidationPipe } from '@nestjs/common';
+import { InstanceService } from './instance/instance.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
+
+  app.enableCors();
+
+  app.get(InstanceService).restoreSessions();
 
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
