@@ -12,6 +12,7 @@ export class WhatsAppInstance {
     qr: '',
     chats: [],
     messages: [],
+    contacts: [],
     online: false,
     sock: null,
     auth: null,
@@ -79,6 +80,24 @@ export class WhatsAppInstance {
           this.instance.qr = url;
         });
       }
+    });
+
+    // When the instance is connected for th first time
+    sock.ev.on(
+      'messaging-history.set',
+      async ({ chats, contacts, messages }) => {
+        this.instance.chats.push(...chats);
+        this.instance.messages.push(...messages);
+        this.instance.contacts.push(...contacts);
+      },
+    );
+
+    // When a new message is received
+    sock?.ev.on('messages.upsert', (m) => {
+      console.log({
+        name: m.messages[0].pushName,
+        message: m.messages[0].message.conversation,
+      });
     });
   }
 

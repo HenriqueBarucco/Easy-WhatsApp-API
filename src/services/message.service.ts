@@ -19,4 +19,16 @@ export class MessageService {
       message: 'Text message sent successfully',
     };
   }
+
+  async teste(key: string): Promise<any> {
+    const instance = this.instanceService.getInstance(key);
+
+    if (!instance) {
+      throw new NotFoundException('Instance not found');
+    }
+
+    const chats = (await instance).instance.chats;
+
+    return chats;
+  }
 }

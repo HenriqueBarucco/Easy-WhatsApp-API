@@ -54,4 +54,10 @@ export class MessageController {
     };
     return this.messageService.sendText(req.user.key, sendTextDto);
   }
+
+  @ApiOperation({ summary: 'TESTE' })
+  @Post('teste')
+  teste(@Request() req: any) {
+    return this.messageService.teste(req.user.key);
+  }
 }
