@@ -1,7 +1,7 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
-import { InstanceService } from './instance.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { InstanceService } from 'src/services/instance.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))

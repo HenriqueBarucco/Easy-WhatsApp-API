@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
-import { MessageService } from './message.service';
+
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { IsNotEmpty } from 'class-validator';
+import { MessageService } from 'src/services/message.service';
 
 export class SendTextDto {
   @ApiProperty()

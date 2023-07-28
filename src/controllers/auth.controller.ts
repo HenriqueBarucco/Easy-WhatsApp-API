@@ -8,7 +8,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -17,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { AuthService } from 'src/services/auth.service';
 
 class SignInDto {
   @ApiProperty()

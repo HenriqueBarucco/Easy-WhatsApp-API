@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { AppService } from './app.service';
+import { AppService } from 'src/services/app.service';
 
 @Controller('app')
 export class AppController {

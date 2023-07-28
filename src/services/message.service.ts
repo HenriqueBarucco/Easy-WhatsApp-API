@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { SendTextDto } from './message.controller';
-import { InstanceService } from 'src/instance/instance.service';
+import { InstanceService } from './instance.service';
+import { SendTextDto } from 'src/controllers/message.controller';
 
 @Injectable()
 export class MessageService {
