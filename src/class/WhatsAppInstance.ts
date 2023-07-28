@@ -95,14 +95,11 @@ export class WhatsAppInstance {
     });
 
     // When the instance is connected for th first time
-    sock.ev.on(
-      'messaging-history.set',
-      async ({ chats, contacts, messages }) => {
-        this.instance.chats.push(...chats);
-        this.instance.messages.push(...messages);
-        this.instance.contacts.push(...contacts);
-      },
-    );
+    sock.ev.on('messaging-history.set', async ({ chats }) => {
+      this.instance.chats.push(...chats);
+      this.instance.messages = this.store.messages;
+      this.instance.contacts = this.store.contacts;
+    });
 
     // When a new message is received
     sock?.ev.on('messages.upsert', (m) => {
@@ -148,5 +145,13 @@ export class WhatsAppInstance {
       },
     );
     return data;
+  }
+
+  async getInstanceDetails() {
+    return {
+      instance_key: this.instance.key,
+      connected: this.instance?.online,
+      user: this.instance?.online ? this.instance.sock?.user : null,
+    };
   }
 }

@@ -15,4 +15,16 @@ export class InstanceController {
   qrbase64(@Request() req: any) {
     return this.instanceService.qrbase64(req.user.key);
   }
+
+  @ApiOperation({ summary: 'Get instance info' })
+  @Get('info')
+  info(@Request() req: any) {
+    return this.instanceService.info(req.user.key);
+  }
+
+  @ApiOperation({ summary: 'Disconnect instance' })
+  @Get('disconnect')
+  disconnect(@Request() req: any) {
+    return this.instanceService.disconnect(req.user.key);
+  }
 }

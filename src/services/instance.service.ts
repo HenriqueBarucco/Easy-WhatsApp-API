@@ -66,4 +66,32 @@ export class InstanceService {
       qrcode,
     };
   }
+
+  async info(key: string): Promise<any> {
+    const instance = this.getInstance(key);
+
+    if (!instance) {
+      throw new NotFoundException('Instance not found');
+    }
+
+    return (await instance).getInstanceDetails();
+  }
+
+  async disconnect(key: string): Promise<any> {
+    const instance = this.getInstance(key);
+
+    if (!instance) {
+      throw new NotFoundException('Instance not found');
+    }
+
+    if (!(await instance).instance.online) {
+      throw new NotFoundException('Instance already offline');
+    }
+
+    await (await instance).instance.sock.logout();
+
+    return {
+      message: 'Instance disconnected successfully',
+    };
+  }
 }
