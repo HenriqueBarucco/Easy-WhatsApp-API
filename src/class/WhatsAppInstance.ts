@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import makeWASocket, {
   DisconnectReason,
+  makeInMemoryStore,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 import * as fs from 'fs';
@@ -11,17 +12,22 @@ export class WhatsAppInstance {
     key: '',
     qr: '',
     chats: [],
-    messages: [],
-    contacts: [],
+    messages: null,
+    contacts: null,
     online: false,
     sock: null,
     auth: null,
   };
   qrcode: any;
+  store = makeInMemoryStore({});
 
   constructor(key: string) {
     this.instance.key = key;
     this.qrcode = require('qrcode');
+    this.store.readFromFile(`sessions/${this.instance.key}/store.json`);
+    setInterval(() => {
+      this.store.writeToFile(`sessions/${this.instance.key}/store.json`);
+    }, 10_000);
   }
 
   async init() {
@@ -44,6 +50,12 @@ export class WhatsAppInstance {
       ...this.instance,
       sock: connection,
     };
+
+    this.store.bind(this.instance.sock.ev);
+
+    this.instance.chats = this.store.chats.all();
+    //this.instance.messages = this.store.messages.all();
+    this.instance.messages = this.store.messages;
 
     this.SocketEvents();
     return this;

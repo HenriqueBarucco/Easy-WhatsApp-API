@@ -27,7 +27,7 @@ export class MessageService {
       throw new NotFoundException('Instance not found');
     }
 
-    const chats = (await instance).instance.chats;
+    const chats = (await instance).instance.messages;
 
     return chats;
   }
