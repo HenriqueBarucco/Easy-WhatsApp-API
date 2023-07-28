@@ -30,10 +30,7 @@ export class InstanceService {
     this.instances.push(...initializedInstances);
   }
 
-  async init(user: User): Promise<any> {
-    if (this.getInstance(user.key)) {
-      return 'Instance already exists';
-    }
+  async createInstance(user: User): Promise<void> {
     const alreadyThere = await this.prisma.instance.findUnique({
       where: { id: user.key },
     });
@@ -58,11 +55,11 @@ export class InstanceService {
       throw new NotFoundException('Instance not found');
     }
 
-    let qrcode = (await instance).instance.qr;
+    const qrcode = (await instance).instance.qr;
 
-    if (qrcode === '') {
+    /* if (qrcode === '') {
       qrcode = (await (await instance).init()).instance.qr;
-    }
+    } */
 
     return {
       message: 'QR Base64 fetched successfully',

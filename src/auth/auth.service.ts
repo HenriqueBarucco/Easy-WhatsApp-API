@@ -8,11 +8,13 @@ import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './auth.controller';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { InstanceService } from 'src/instance/instance.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
+    private instanceService: InstanceService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -41,6 +43,9 @@ export class AuthService {
       name: signUpDto.name,
       email: signUpDto.email,
     });
+
+    await this.instanceService.createInstance(newUser);
+
     return newUser;
   }
 }
