@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppModule } from './modules/app.module';
-import { UsersModule } from './modules/users.module';
-import { AuthModule } from './modules/auth.module';
-import { InstanceModule } from './modules/instance.module';
-import { MessageModule } from './modules/message.module';
+import { AppModule } from './app.module';
+import { UsersModule } from './users.module';
+import { AuthModule } from './auth.module';
+import { InstanceModule } from './instance.module';
+import { MessageModule } from './message.module';
 
 @Module({
   imports: [
