@@ -3,6 +3,8 @@ import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class WhatsAppInstance {
   instance = {
@@ -11,7 +13,6 @@ export class WhatsAppInstance {
     chats: [],
     messages: [],
     online: false,
-    qrRetry: 0,
     sock: null,
     auth: null,
   };
@@ -23,7 +24,9 @@ export class WhatsAppInstance {
   }
 
   async init() {
-    const { state, saveCreds } = await useMultiFileAuthState('sessions');
+    const { state, saveCreds } = await useMultiFileAuthState(
+      `sessions/${this.instance.key}`,
+    );
     this.instance.auth = { state: state, saveCreds: saveCreds };
 
     const connection = makeWASocket({
@@ -62,8 +65,10 @@ export class WhatsAppInstance {
         ) {
           await this.init();
         } else {
-          // TODO delete instance from array
+          this.deleteFolderRecursive(`sessions/${this.instance.key}`);
           this.instance.online = false;
+
+          await this.init();
         }
       } else if (connection === 'open') {
         this.instance.online = true;
@@ -72,16 +77,23 @@ export class WhatsAppInstance {
       if (qr) {
         this.qrcode.toDataURL(qr).then((url) => {
           this.instance.qr = url;
-          this.instance.qrRetry++;
-          if (this.instance.qrRetry >= 3) {
-            this.instance.sock.ws.close();
-            this.instance.sock.ev.removeAllListeners();
-            this.instance.qr = '';
-            // TODO log connection terminated
-          }
         });
       }
     });
+  }
+
+  deleteFolderRecursive(folderPath: string) {
+    if (fs.existsSync(folderPath)) {
+      fs.readdirSync(folderPath).forEach((file) => {
+        const curPath = path.join(folderPath, file);
+        if (fs.lstatSync(curPath).isDirectory()) {
+          this.deleteFolderRecursive(curPath);
+        } else {
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(folderPath);
+    }
   }
 
   getWhatsAppId(id: string) {

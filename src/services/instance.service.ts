@@ -55,11 +55,11 @@ export class InstanceService {
       throw new NotFoundException('Instance not found');
     }
 
-    const qrcode = (await instance).instance.qr;
+    if ((await instance).instance.online) {
+      throw new NotFoundException('Instance already online');
+    }
 
-    /* if (qrcode === '') {
-      qrcode = (await (await instance).init()).instance.qr;
-    } */
+    const qrcode = (await instance).instance.qr;
 
     return {
       message: 'QR Base64 fetched successfully',

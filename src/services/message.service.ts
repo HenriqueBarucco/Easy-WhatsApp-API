@@ -15,8 +15,6 @@ export class MessageService {
 
     (await instance).sendTextMessage(sendTextDto.phone, sendTextDto.message);
 
-    /* console.log('sendTextDto', sendTextDto);
-    console.log('key', key); */
     return {
       message: 'Text message sent successfully',
     };
