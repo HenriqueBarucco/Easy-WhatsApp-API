@@ -27,6 +27,6 @@ async function bootstrap() {
   app.get(InstanceService).restoreSessions();
 
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+  await app.listen(8080);
 }
 bootstrap();
