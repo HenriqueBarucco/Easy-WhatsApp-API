@@ -21,7 +21,7 @@ import { AuthService } from 'src/services/auth.service';
 class SignInDto {
   @ApiProperty()
   @IsNotEmpty()
-  login: string;
+  username: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -31,7 +31,7 @@ class SignInDto {
 export class SignUpDto {
   @ApiProperty()
   @IsNotEmpty()
-  login: string;
+  username: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -57,7 +57,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto.login, signInDto.password);
+    return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
   @ApiOperation({ summary: 'Create your account' })
