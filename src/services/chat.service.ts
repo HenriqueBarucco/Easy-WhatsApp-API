@@ -25,10 +25,20 @@ export class ChatService {
     }
 
     const contacts = (await instance).instance.chats;
+    const phone = (await (await instance).getInstanceDetails()).user?.id.split(
+      ':',
+    )[0];
 
-    console.log(contacts);
-
-    return contacts;
+    return contacts.reduce((acc, contact) => {
+      if (
+        contact.unreadCount > 0 &&
+        !contact.id.includes('status') &&
+        !contact.id.includes(phone)
+      ) {
+        acc.push({ phone: contact?.id.split('@')[0] });
+      }
+      return acc;
+    }, []);
   }
 
   private processObject(inputObject) {
