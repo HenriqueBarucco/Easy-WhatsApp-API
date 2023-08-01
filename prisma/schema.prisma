@@ -17,6 +17,7 @@ model User {
   name     String
   password String
   key      String     @unique @default(uuid())
+  token    String?
   Instance Instance[]
 
   @@map("users_tbl")
