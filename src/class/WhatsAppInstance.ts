@@ -1,4 +1,3 @@
-import { NotFoundException } from '@nestjs/common';
 import makeWASocket, {
   DisconnectReason,
   makeInMemoryStore,
@@ -133,7 +132,7 @@ export class WhatsAppInstance {
     if (id.includes('@g.us')) return true;
     const [result] = await this.instance.sock?.onWhatsApp(id);
     if (result?.exists) return true;
-    throw new NotFoundException('no account exists');
+    throw new Error('No account exists');
   }
 
   async sendTextMessage(phone: string, message: string) {

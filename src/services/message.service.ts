@@ -13,7 +13,13 @@ export class MessageService {
       throw new NotFoundException('Instance not found or offline');
     }
 
-    (await instance).sendTextMessage(sendTextDto.phone, sendTextDto.message);
+    try {
+      await (
+        await instance
+      ).sendTextMessage(sendTextDto.phone, sendTextDto.message);
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
 
     return {
       message: 'Text message sent successfully',
