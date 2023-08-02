@@ -9,8 +9,8 @@ export class MessageService {
   async sendText(key: string, sendTextDto: SendTextDto): Promise<any> {
     const instance = this.instanceService.getInstance(key);
 
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
+    if (!instance || !(await instance).instance.online) {
+      throw new NotFoundException('Instance not found or offline');
     }
 
     (await instance).sendTextMessage(sendTextDto.phone, sendTextDto.message);

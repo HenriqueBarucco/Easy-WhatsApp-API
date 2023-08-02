@@ -36,7 +36,7 @@ export class TokenService {
         id: user.id,
       },
       data: {
-        token: '',
+        token: null,
       },
     });
 

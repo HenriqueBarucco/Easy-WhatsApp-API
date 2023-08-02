@@ -14,6 +14,14 @@ export class UsersService {
     });
   }
 
+  async userByToken(token: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: {
+        token,
+      },
+    });
+  }
+
   async users(params: {
     skip?: number;
     take?: number;

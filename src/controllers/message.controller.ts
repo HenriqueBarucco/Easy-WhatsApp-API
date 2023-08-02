@@ -1,35 +1,29 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { IsNotEmpty } from 'class-validator';
+import { TokenAuthGuard } from 'src/jwt/token.guard';
 import { MessageService } from 'src/services/message.service';
 
 export class SendTextDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'Opcional' })
+  token: string;
+
+  @ApiProperty({ example: 'Phone Number - 5516990000000' })
   @IsNotEmpty()
   phone: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Message to send' })
   @IsNotEmpty()
   message: string;
 }
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(TokenAuthGuard)
 @ApiTags('Message')
 @Controller('message')
 export class MessageController {
@@ -41,21 +35,7 @@ export class MessageController {
     return this.messageService.sendText(req.user.key, sendTextDto);
   }
 
-  @ApiOperation({ summary: 'Send text message' })
-  @Get('text/:phone/:message')
-  sendTextGet(
-    @Request() req: any,
-    @Param('phone') phone: string,
-    @Param('message') message: string,
-  ) {
-    const sendTextDto = {
-      phone,
-      message,
-    };
-    return this.messageService.sendText(req.user.key, sendTextDto);
-  }
-
-  @ApiOperation({ summary: 'TESTE' })
+  @ApiOperation({ summary: 'TESTE', deprecated: true })
   @Post('teste')
   teste(@Request() req: any) {
     return this.messageService.teste(req.user.key);
