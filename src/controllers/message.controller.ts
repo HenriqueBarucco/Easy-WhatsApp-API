@@ -5,12 +5,14 @@ import {
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { TokenAuthGuard } from 'src/jwt/token.guard';
 import { MessageService } from 'src/services/message.service';
 
 export class SendTextDto {
   @ApiProperty({ example: 'Opcional' })
+  @IsUUID()
+  @IsOptional()
   token: string;
 
   @ApiProperty({ example: 'Phone Number - 5516990000000' })
