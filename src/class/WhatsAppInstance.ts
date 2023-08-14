@@ -104,7 +104,7 @@ export class WhatsAppInstance {
     sock?.ev.on('messages.upsert', (m) => {
       console.log({
         name: m.messages[0].pushName,
-        message: m.messages[0].message.conversation,
+        message: m.messages[0].message?.conversation,
       });
     });
   }
@@ -132,7 +132,7 @@ export class WhatsAppInstance {
     if (id.includes('@g.us')) return true;
     const [result] = await this.instance.sock?.onWhatsApp(id);
     if (result?.exists) return true;
-    throw new Error('No account exists');
+    //throw new Error('No account exists');
   }
 
   async sendTextMessage(phone: string, message: string) {
@@ -152,5 +152,18 @@ export class WhatsAppInstance {
       connected: this.instance?.online,
       user: this.instance?.online ? this.instance.sock?.user : null,
     };
+  }
+
+  async getProfilePicture(phone: string) {
+    const exists = await this.verifyId(this.getWhatsAppId(phone));
+    if (!exists) return null;
+    try {
+      const data = await this.instance.sock?.profilePictureUrl(
+        this.getWhatsAppId(phone),
+      );
+      return data;
+    } catch (error) {
+      // TODO : Handle error SE QUISER
+    }
   }
 }

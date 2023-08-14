@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ChatService } from 'src/services/chat.service';
@@ -20,5 +20,11 @@ export class ChatController {
   @Get('contacts')
   contactsRecent(@Request() req: any) {
     return this.chatService.contactsRecent(req.user.key);
+  }
+
+  @ApiOperation({ summary: 'Get picture from a contact' })
+  @Get('picture/:phone')
+  contactPicture(@Request() req: any, @Query('phone') phone: string) {
+    return this.chatService.contactPicture(req.user.key, phone);
   }
 }
