@@ -1,12 +1,12 @@
 {
-  "name": "easy-whatsapp-bot",
+  "name": "easy-whatsapp-backend",
   "version": "0.0.1",
   "description": "The simplest API for WhatsApp bots.",
   "author": "Henrique Barucco",
   "private": false,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
