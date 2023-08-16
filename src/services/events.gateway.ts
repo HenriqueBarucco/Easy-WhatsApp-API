@@ -17,6 +17,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly io: Server) {}
   private connectedClients: Socket[] = [];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleConnection(client: Socket, ...args: any[]) {
     this.connectedClients.push(client);
   }
