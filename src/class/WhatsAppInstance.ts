@@ -84,6 +84,7 @@ export class WhatsAppInstance {
         } else {
           this.deleteFolderRecursive(`sessions/${this.instance.key}`);
           this.instance.online = false;
+          this.eventsGateway.emitEvent('instanceDisconnected', {});
 
           await this.init();
         }
@@ -95,6 +96,7 @@ export class WhatsAppInstance {
       if (qr) {
         this.qrcode.toDataURL(qr).then((url) => {
           this.instance.qr = url;
+          this.eventsGateway.emitEvent('qrCodeChanged', { url });
         });
       }
     });
