@@ -89,6 +89,7 @@ export class WhatsAppInstance {
         }
       } else if (connection === 'open') {
         this.instance.online = true;
+        this.eventsGateway.emitEvent('qrCodeSuccess', {});
       }
 
       if (qr) {
@@ -106,11 +107,11 @@ export class WhatsAppInstance {
     });
 
     // When a new message is received
-    sock?.ev.on('messages.upsert', (m) => {
-      /* this.eventsGateway.emitEvent('message', {
+    sock?.ev.on('messages.upsert', (m: any) => {
+      this.eventsGateway.emitEvent('message', {
         name: m.messages[0].pushName,
         message: m.messages[0].message?.conversation,
-      }); */
+      });
       // TODO IMPLEMENTAR LOGICA DO SOCKET.IO
       console.log({
         name: m.messages[0].pushName,

@@ -38,7 +38,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   emitEvent(event: string, data: any): void {
     this.io.emit(event, data);
     this.connectedClients.forEach((c) => {
-      c.emit('message', data);
+      c.emit(event, data);
     });
   }
 }
