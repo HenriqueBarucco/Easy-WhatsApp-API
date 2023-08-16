@@ -1,3 +1,4 @@
+import { Inject } from '@nestjs/common';
 import makeWASocket, {
   DisconnectReason,
   makeInMemoryStore,
@@ -5,6 +6,7 @@ import makeWASocket, {
 } from '@whiskeysockets/baileys';
 import * as fs from 'fs';
 import * as path from 'path';
+import { EventsGateway } from 'src/services/events.gateway';
 
 export class WhatsAppInstance {
   instance = {
@@ -20,7 +22,10 @@ export class WhatsAppInstance {
   qrcode: any;
   store = makeInMemoryStore({});
 
-  constructor(key: string) {
+  constructor(
+    key: string,
+    @Inject('EventsGateway') private readonly eventsGateway: EventsGateway,
+  ) {
     this.instance.key = key;
     this.qrcode = require('qrcode');
     this.store.readFromFile(`sessions/${this.instance.key}/store.json`);
@@ -102,6 +107,11 @@ export class WhatsAppInstance {
 
     // When a new message is received
     sock?.ev.on('messages.upsert', (m) => {
+      /* this.eventsGateway.emitEvent('message', {
+        name: m.messages[0].pushName,
+        message: m.messages[0].message?.conversation,
+      }); */
+      // TODO IMPLEMENTAR LOGICA DO SOCKET.IO
       console.log({
         name: m.messages[0].pushName,
         message: m.messages[0].message?.conversation,

@@ -5,6 +5,7 @@ import { MessageModule } from './message.module';
 import { ChatModule } from './chat.module';
 import { TokenModule } from './token.module';
 import { ConfigModule } from '@nestjs/config';
+import { EventsModule } from './events.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     MessageModule,
     ChatModule,
     TokenModule,
+    EventsModule,
     ConfigModule.forRoot(),
   ],
 })

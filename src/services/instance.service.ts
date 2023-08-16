@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { WhatsAppInstance } from 'src/class/WhatsAppInstance';
 import { PrismaService } from './prisma.service';
+import { EventsGateway } from './events.gateway';
 
 @Injectable()
 export class InstanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventsGateway: EventsGateway,
+  ) {}
   instances = [];
 
   getInstance(key: string): Promise<WhatsAppInstance | null> {
@@ -20,7 +24,10 @@ export class InstanceService {
     const promises = [];
 
     instances.forEach((instance) => {
-      const restoreSessions = new WhatsAppInstance(instance.id);
+      const restoreSessions = new WhatsAppInstance(
+        instance.id,
+        this.eventsGateway,
+      );
       const initPromise = restoreSessions.init();
       promises.push(initPromise);
     });
@@ -42,7 +49,7 @@ export class InstanceService {
         },
       });
     }
-    const instance = new WhatsAppInstance(user.key);
+    const instance = new WhatsAppInstance(user.key, this.eventsGateway);
     const data = await instance.init();
 
     this.instances.push(data);
