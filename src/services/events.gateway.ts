@@ -19,6 +19,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleConnection(client: Socket, ...args: any[]) {
+    console.log(
+      'Client connected',
+      client.handshake.query.key,
+      'Id:',
+      client.id,
+    );
     this.connectedClients.push(client);
   }
 
@@ -35,10 +41,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  emitEvent(event: string, data: any): void {
-    this.io.emit(event, data);
+  emitEvent(key: string, event: string, data?: any): void {
     this.connectedClients.forEach((c) => {
-      c.emit(event, data);
+      if (c.handshake.query.key === key) {
+        c.emit(event, data);
+      }
     });
   }
 }

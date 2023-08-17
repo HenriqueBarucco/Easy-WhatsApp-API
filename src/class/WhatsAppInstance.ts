@@ -84,19 +84,25 @@ export class WhatsAppInstance {
         } else {
           this.deleteFolderRecursive(`sessions/${this.instance.key}`);
           this.instance.online = false;
-          this.eventsGateway.emitEvent('instanceDisconnected', {});
+          this.eventsGateway.emitEvent(
+            this.instance.key,
+            'instanceDisconnected',
+            {},
+          );
 
           await this.init();
         }
       } else if (connection === 'open') {
         this.instance.online = true;
-        this.eventsGateway.emitEvent('qrCodeSuccess', {});
+        this.eventsGateway.emitEvent(this.instance.key, 'qrCodeSuccess');
       }
 
       if (qr) {
         this.qrcode.toDataURL(qr).then((url) => {
           this.instance.qr = url;
-          this.eventsGateway.emitEvent('qrCodeChanged', { url });
+          this.eventsGateway.emitEvent(this.instance.key, 'qrCodeChanged', {
+            url,
+          });
         });
       }
     });
@@ -110,7 +116,7 @@ export class WhatsAppInstance {
 
     // When a new message is received
     sock?.ev.on('messages.upsert', (m: any) => {
-      this.eventsGateway.emitEvent('message', {
+      this.eventsGateway.emitEvent(this.instance.key, 'message', {
         name: m.messages[0].pushName,
         message: m.messages[0].message?.conversation,
       });

@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id       Int        @id @default(autoincrement())
+  id       String     @id @default(uuid())
   username String     @unique
   email    String     @unique
   name     String
@@ -25,7 +25,7 @@ model User {
 
 model Instance {
   id      String @id
-  ownerId Int
+  ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
 
   @@map("instances_tbl")
