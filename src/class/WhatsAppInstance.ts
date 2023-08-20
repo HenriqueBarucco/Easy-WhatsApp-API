@@ -116,14 +116,13 @@ export class WhatsAppInstance {
 
     // When a new message is received
     sock?.ev.on('messages.upsert', (m: any) => {
+      if (m.messages[0].key.fromMe) return;
+
       this.eventsGateway.emitEvent(this.instance.key, 'message', {
         name: m.messages[0].pushName,
+        phone: m.messages[0].key.remoteJid.split('@')[0],
         message: m.messages[0].message?.conversation,
-      });
-      // TODO IMPLEMENTAR LOGICA DO SOCKET.IO
-      console.log({
-        name: m.messages[0].pushName,
-        message: m.messages[0].message?.conversation,
+        messageTimestamp: m.messages[0].messageTimestamp,
       });
     });
   }
