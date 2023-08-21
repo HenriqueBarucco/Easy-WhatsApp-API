@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InstanceService } from './instance.service';
-import { type } from 'os';
 
 @Injectable()
 export class ChatService {
