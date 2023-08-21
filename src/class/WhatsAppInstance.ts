@@ -1,5 +1,6 @@
 import { Inject } from '@nestjs/common';
 import makeWASocket, {
+  Contact,
   DisconnectReason,
   makeInMemoryStore,
   useMultiFileAuthState,
@@ -170,6 +171,10 @@ export class WhatsAppInstance {
       connected: this.instance?.online,
       user: this.instance?.online ? this.instance.sock?.user : null,
     };
+  }
+
+  async getContacts(): Promise<any> {
+    return this.store.contacts;
   }
 
   async getProfilePicture(phone: string) {

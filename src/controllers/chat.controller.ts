@@ -22,6 +22,12 @@ export class ChatController {
     return this.chatService.contactsRecent(req.user.key);
   }
 
+  @ApiOperation({ summary: 'Get all your contacts' })
+  @Get('contactsall')
+  allContacts(@Request() req: any) {
+    return this.chatService.contactsAll(req.user.key);
+  }
+
   @ApiOperation({ summary: 'Get picture from a contact' })
   @Get('picture/:phone')
   contactPicture(@Request() req: any, @Query('phone') phone: string) {

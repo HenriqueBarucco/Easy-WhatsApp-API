@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InstanceService } from './instance.service';
+import { type } from 'os';
 
 @Injectable()
 export class ChatService {
@@ -53,6 +54,28 @@ export class ChatService {
       })),
     );
 
+    return contactsWithPictures;
+  }
+
+  async contactsAll(key: string): Promise<any[]> {
+    const instance = this.instanceService.getInstance(key);
+
+    if (!instance) {
+      throw new NotFoundException('Instance not found');
+    }
+
+    const contacts = await (await instance).getContacts();
+
+    const contactsWithPictures = [];
+
+    for (const contact of Object.values(contacts) as any) {
+      contactsWithPictures.push({
+        phone: contact.id.split('@')[0],
+        notify: contact.notify,
+        name: contact.name,
+        picture: await (await instance).getProfilePicture(contact.id),
+      });
+    }
     return contactsWithPictures;
   }
 
