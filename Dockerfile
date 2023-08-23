@@ -9,4 +9,4 @@ FROM node:20
 WORKDIR /app
 COPY --from=builder /app ./
 EXPOSE 8080
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:debug"]
