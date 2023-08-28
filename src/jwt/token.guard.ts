@@ -26,15 +26,24 @@ export class TokenAuthGuard extends AuthGuard('jwt') implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const body = request.body;
+    const token = request.body?.token;
     const bearer = request.headers.authorization?.split(' ')[1];
 
-    if (!body.token && !bearer) {
+    console.log(request.body);
+
+    //console.log(body.token, bearer, body);
+    /* const formData: FormData = body as FormData;
+
+    const token: string = formData['token'] as string;
+
+    console.log(token); */
+
+    if (!token && !bearer) {
       throw new UnauthorizedException('No token or Bearer token found');
     }
 
     if (!bearer) {
-      const user = await this.usersService.userByToken(body.token);
+      const user = await this.usersService.userByToken(token);
       if (!user) {
         throw new UnauthorizedException('Your token is invalid');
       }

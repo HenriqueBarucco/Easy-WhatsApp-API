@@ -35,6 +35,22 @@ export class SendTextDto {
   message: string;
 }
 
+export class SendFileDto {
+  @ApiProperty({ example: 'Opcional' })
+  @IsOptional()
+  token: string;
+
+  @ApiProperty({ example: 'Phone Number - 5516990000000' })
+  phone: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'File to upload',
+  })
+  file: string;
+}
+
 @ApiBearerAuth()
 @UseGuards(TokenAuthGuard)
 @ApiTags('Message')
@@ -49,13 +65,14 @@ export class MessageController {
   }
 
   @ApiOperation({ summary: 'Send file' })
+  @ApiConsumes('multipart/form-data')
   @Post('file')
   @UseInterceptors(FileInterceptor('file'))
-  sendFile(@Request() req: any, @UploadedFile() file: MulterFile) {
-    const formData: FormData = req.body as FormData;
-
-    const phone: string = formData['phone'] as string;
-
-    return this.messageService.sendFile(req.user.key, phone, file);
+  sendFile(
+    @Request() req: any,
+    @UploadedFile() file: MulterFile,
+    @Body() sendFileDto: SendFileDto,
+  ) {
+    return this.messageService.sendFile(req.user.key, sendFileDto.phone, file);
   }
 }

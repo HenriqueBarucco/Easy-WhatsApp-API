@@ -1,6 +1,5 @@
 import { Inject } from '@nestjs/common';
 import makeWASocket, {
-  Contact,
   DisconnectReason,
   makeInMemoryStore,
   useMultiFileAuthState,
