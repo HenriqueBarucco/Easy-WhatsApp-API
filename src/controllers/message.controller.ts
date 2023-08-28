@@ -1,6 +1,16 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Request,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiOperation,
   ApiProperty,
   ApiTags,
@@ -8,6 +18,7 @@ import {
 import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { TokenAuthGuard } from 'src/jwt/token.guard';
 import { MessageService } from 'src/services/message.service';
+import { MulterFile } from 'multer';
 
 export class SendTextDto {
   @ApiProperty({ example: 'Opcional' })
@@ -33,13 +44,18 @@ export class MessageController {
 
   @ApiOperation({ summary: 'Send text message' })
   @Post('text')
-  sendTextPost(@Request() req: any, @Body() sendTextDto: SendTextDto) {
+  sendText(@Request() req: any, @Body() sendTextDto: SendTextDto) {
     return this.messageService.sendText(req.user.key, sendTextDto);
   }
 
-  @ApiOperation({ summary: 'TESTE', deprecated: true })
-  @Post('teste')
-  teste(@Request() req: any) {
-    return this.messageService.teste(req.user.key);
+  @ApiOperation({ summary: 'Send file' })
+  @Post('file')
+  @UseInterceptors(FileInterceptor('file'))
+  sendFile(@Request() req: any, @UploadedFile() file: MulterFile) {
+    const formData: FormData = req.body as FormData;
+
+    const phone: string = formData['phone'] as string;
+
+    return this.messageService.sendFile(req.user.key, phone, file);
   }
 }

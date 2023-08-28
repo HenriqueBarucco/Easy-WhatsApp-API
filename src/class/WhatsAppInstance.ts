@@ -165,6 +165,27 @@ export class WhatsAppInstance {
     return data;
   }
 
+  async sendMediaFile(
+    phone: string,
+    file,
+    type,
+    caption = '',
+    filename: string,
+  ) {
+    await this.verifyId(this.getWhatsAppId(phone));
+    const data = await this.instance.sock?.sendMessage(
+      this.getWhatsAppId(phone),
+      {
+        mimetype: file.mimetype,
+        [type]: file.buffer,
+        caption: caption,
+        ptt: type === 'audio' ? true : false,
+        fileName: filename ? filename : file.originalname,
+      },
+    );
+    return data;
+  }
+
   async getInstanceDetails() {
     return {
       instance_key: this.instance.key,
