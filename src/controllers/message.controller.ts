@@ -36,7 +36,7 @@ export class SendTextDto {
 }
 
 export class SendFileDto {
-  @ApiProperty({ example: 'Opcional' })
+  @ApiProperty({ example: 'Opcional', required: false })
   @IsOptional()
   token: string;
 
