@@ -24,36 +24,38 @@ export class ChatService {
       throw new NotFoundException('Instance not found');
     }
 
-    const contacts = (await instance).instance.chats;
+    const chats = (await instance).instance.chats;
+    const contacts = await (await instance).getContacts();
+
     const phone = (await (await instance).getInstanceDetails()).user?.id.split(
       ':',
     )[0];
 
-    const contactMap = new Map<string, boolean>();
-
-    contacts.forEach((contact) => {
-      if (
-        contact.unreadCount >= 0 &&
-        !contact.id.includes('status') &&
-        !contact.id.includes(phone)
-      ) {
-        const phoneWithoutDomain = contact.id.split('@')[0];
-        contactMap.set(phoneWithoutDomain, true);
-      }
-    });
-
-    const uniqueContacts = Array.from(contactMap.keys()).map((phone) => ({
-      phone,
-    }));
-
     const contactsWithPictures = await Promise.all(
-      uniqueContacts.map(async (contact) => ({
-        ...contact,
-        picture: await (await instance).getProfilePicture(contact.phone),
-      })),
+      chats.map(async (contact) => {
+        if (
+          contact.unreadCount >= 0 &&
+          !contact.id.includes('status') &&
+          !contact.id.includes(phone)
+        ) {
+          console.log(contacts[contact.id]);
+          return {
+            phone: contact.id.split('@')[0],
+            name:
+              contacts[contact.id]?.name ||
+              contacts[contact.id]?.notify ||
+              contact.id.split('@')[0],
+            picture: await (await instance).getProfilePicture(contact.id),
+          };
+        }
+      }),
     );
 
-    return contactsWithPictures;
+    const filteredContacts = contactsWithPictures.filter(
+      (contact) => contact !== undefined,
+    );
+
+    return filteredContacts;
   }
 
   async contactsAll(key: string): Promise<any[]> {
