@@ -37,6 +37,8 @@ export class MessageService {
       throw new NotFoundException('Instance offline');
     }
 
+    console.log(file);
+
     try {
       await (await instance).sendMediaFile(phone, file, 'document', '', '');
     } catch (error) {
