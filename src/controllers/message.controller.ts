@@ -65,7 +65,7 @@ export class MessageController {
   @ApiConsumes('multipart/form-data')
   @ApiHeader({
     name: 'Token',
-    description: 'Your token description',
+    description: 'Your personal token (optional)',
     required: false,
   })
   @Post('file')
