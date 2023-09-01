@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 
 @Injectable()
@@ -8,10 +8,6 @@ export class ChatService {
   async chat(key: string): Promise<any> {
     const instance = this.instanceService.getInstance(key);
 
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
-
     const chats = (await instance).instance.messages;
 
     return this.processObject(chats);
@@ -19,10 +15,6 @@ export class ChatService {
 
   async contactsRecent(key: string): Promise<any[]> {
     const instance = this.instanceService.getInstance(key);
-
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
 
     const chats = (await instance).instance.chats;
     const contacts = await (await instance).getContacts();
@@ -60,10 +52,6 @@ export class ChatService {
 
   async contactsAll(key: string): Promise<any[]> {
     const instance = this.instanceService.getInstance(key);
-
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
 
     const contacts = await (await instance).getContacts();
 
@@ -130,10 +118,6 @@ export class ChatService {
 
   contactPicture(key: any, phone: string): Promise<any> {
     const instance = this.instanceService.getInstance(key);
-
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
 
     return (instance as any).getProfilePicture(phone);
   }

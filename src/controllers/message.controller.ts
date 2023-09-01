@@ -11,14 +11,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiHeader,
   ApiOperation,
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { SanitizedUser, UserRequest } from 'src/decorators/user.decorator';
 import { TokenAuthGuard } from 'src/jwt/token.guard';
 import { MessageService } from 'src/services/message.service';
-import { MulterFile } from 'multer';
 
 export class SendTextDto {
   @ApiProperty({ example: 'Opcional' })
@@ -36,10 +37,6 @@ export class SendTextDto {
 }
 
 export class SendFileDto {
-  @ApiProperty({ example: 'Opcional', required: false })
-  @IsOptional()
-  token: string;
-
   @ApiProperty({ example: 'Phone Number - 5516990000000' })
   phone: string;
 
@@ -66,13 +63,18 @@ export class MessageController {
 
   @ApiOperation({ summary: 'Send file' })
   @ApiConsumes('multipart/form-data')
+  @ApiHeader({
+    name: 'Token',
+    description: 'Your token description',
+    required: false,
+  })
   @Post('file')
   @UseInterceptors(FileInterceptor('file'))
   sendFile(
-    @Request() req: any,
-    @UploadedFile() file: MulterFile,
+    @UserRequest() user: SanitizedUser,
+    @UploadedFile() file: Express.Multer.File,
     @Body() sendFileDto: SendFileDto,
   ) {
-    return this.messageService.sendFile(req.user.key, sendFileDto.phone, file);
+    return this.messageService.sendFile(user.key, sendFileDto.phone, file);
   }
 }

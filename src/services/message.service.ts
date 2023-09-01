@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 import { SendTextDto } from 'src/controllers/message.controller';
-import { MulterFile } from 'multer';
 
 @Injectable()
 export class MessageService {
@@ -10,8 +9,8 @@ export class MessageService {
   async sendText(key: string, sendTextDto: SendTextDto): Promise<any> {
     const instance = this.instanceService.getInstance(key);
 
-    if (!instance || !(await instance).instance.online) {
-      throw new NotFoundException('Instance not found or offline');
+    if (!(await instance).instance.online) {
+      throw new NotFoundException('Instance offline');
     }
 
     try {
@@ -27,11 +26,15 @@ export class MessageService {
     };
   }
 
-  async sendFile(key: string, phone: string, file: MulterFile): Promise<any> {
+  async sendFile(
+    key: string,
+    phone: string,
+    file: Express.Multer.File,
+  ): Promise<any> {
     const instance = this.instanceService.getInstance(key);
 
-    if (!instance || !(await instance).instance.online) {
-      throw new NotFoundException('Instance not found or offline');
+    if (!(await instance).instance.online) {
+      throw new NotFoundException('Instance offline');
     }
 
     try {

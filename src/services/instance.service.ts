@@ -16,6 +16,11 @@ export class InstanceService {
     const instance = this.instances.find(
       (instance) => instance.instance.key === key,
     );
+
+    if (!instance) {
+      throw new NotFoundException('Instance not found');
+    }
+
     return instance;
   }
 
@@ -58,10 +63,6 @@ export class InstanceService {
   async qrbase64(key: string): Promise<any> {
     const instance = this.getInstance(key);
 
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
-
     if ((await instance).instance.online) {
       throw new NotFoundException('Instance already online');
     }
@@ -77,19 +78,11 @@ export class InstanceService {
   async info(key: string): Promise<any> {
     const instance = this.getInstance(key);
 
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
-
     return (await instance).getInstanceDetails();
   }
 
   async disconnect(key: string): Promise<any> {
     const instance = this.getInstance(key);
-
-    if (!instance) {
-      throw new NotFoundException('Instance not found');
-    }
 
     if (!(await instance).instance.online) {
       throw new NotFoundException('Instance already offline');
