@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InstanceService } from './instance.service';
-import { SendTextDto } from 'src/controllers/message.controller';
 
 @Injectable()
 export class MessageService {
   constructor(private instanceService: InstanceService) {}
 
-  async sendText(key: string, sendTextDto: SendTextDto): Promise<any> {
+  async sendText(key: string, phone: string, message: string): Promise<any> {
     const instance = this.instanceService.getInstance(key);
 
     if (!(await instance).instance.online) {
@@ -14,9 +13,7 @@ export class MessageService {
     }
 
     try {
-      await (
-        await instance
-      ).sendTextMessage(sendTextDto.phone, sendTextDto.message);
+      await (await instance).sendTextMessage(phone, message);
     } catch (error) {
       throw new NotFoundException(error.message);
     }

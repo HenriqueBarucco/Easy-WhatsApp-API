@@ -21,5 +21,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   controllers: [MessageController],
   providers: [MessageService, PrismaService, UsersService, ConfigService],
+  exports: [MessageService],
 })
 export class MessageModule {}

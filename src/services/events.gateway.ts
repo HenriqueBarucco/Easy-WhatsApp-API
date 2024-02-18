@@ -5,6 +5,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { MessageService } from './message.service';
 
 const options = {
   cors: {
@@ -14,7 +15,10 @@ const options = {
 };
 @WebSocketGateway(options)
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly io: Server) {}
+  constructor(
+    private readonly io: Server,
+    private readonly messageService: MessageService,
+  ) {}
   private connectedClients: Socket[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -39,6 +43,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         c.emit('customEventResponse', data);
       }
     });
+  }
+
+  @SubscribeMessage('message')
+  handleMessageEvent(client: Socket, data: any): void {
+    this.messageService.sendText(
+      client.handshake.query.key[0],
+      data.phone,
+      data.message,
+    );
   }
 
   emitEvent(key: string, event: string, data?: any): void {

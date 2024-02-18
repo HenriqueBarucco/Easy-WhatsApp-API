@@ -58,7 +58,11 @@ export class MessageController {
   @ApiOperation({ summary: 'Send text message' })
   @Post('text')
   sendText(@Request() req: any, @Body() sendTextDto: SendTextDto) {
-    return this.messageService.sendText(req.user.key, sendTextDto);
+    return this.messageService.sendText(
+      req.user.key,
+      sendTextDto.phone,
+      sendTextDto.message,
+    );
   }
 
   @ApiOperation({ summary: 'Send file' })
