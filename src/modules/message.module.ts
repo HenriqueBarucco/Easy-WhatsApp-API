@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MessageController } from 'src/controllers/message.controller';
 import { MessageService } from 'src/services/message.service';
 import { InstanceModule } from './instance.module';
@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
-    InstanceModule,
+    forwardRef(() => InstanceModule),
   ],
   controllers: [MessageController],
   providers: [MessageService, PrismaService, UsersService, ConfigService],
