@@ -29,7 +29,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket, ...args: any[]) {
     console.log(
       'Client connected',
-      client.handshake.query.key,
+      client.handshake.query.key || client.handshake.query.token,
       'Id:',
       client.id,
     );
@@ -53,7 +53,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessageEvent(client: Socket, data: any): Promise<void> {
     console.log('Token: ', client.handshake.query.token);
     const key = await this.tokenService.getKeyByToken(
-      client.handshake.query.token,
+      Array.isArray(client.handshake.query.token)
+        ? client.handshake.query.token[0]
+        : client.handshake.query.token,
     );
     console.log('Message event', key, data);
     if (key != null) {
