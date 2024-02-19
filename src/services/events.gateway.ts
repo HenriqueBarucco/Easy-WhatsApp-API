@@ -51,13 +51,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('message')
   async handleMessageEvent(client: Socket, data: any): Promise<void> {
-    console.log('Token: ', client.handshake.query.token);
     const key = await this.tokenService.getKeyByToken(
       Array.isArray(client.handshake.query.token)
         ? client.handshake.query.token[0]
         : client.handshake.query.token,
     );
-    console.log('Message event', key, data);
     if (key != null) {
       await this.messageService.sendText(key, data.phone, data.message);
     }
