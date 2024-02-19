@@ -58,4 +58,18 @@ export class TokenService {
 
     return user.token || null;
   }
+
+  async getKeyByToken(token: string): Promise<string | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        token: token,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user.key;
+  }
 }
