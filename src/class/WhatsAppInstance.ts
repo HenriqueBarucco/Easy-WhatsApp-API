@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import makeWASocket, {
   DisconnectReason,
   makeInMemoryStore,
@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { EventsGateway } from 'src/services/events.gateway';
 
+@Injectable()
 export class WhatsAppInstance {
   instance = {
     key: '',
@@ -24,7 +25,8 @@ export class WhatsAppInstance {
 
   constructor(
     key: string,
-    @Inject('EventsGateway') private readonly eventsGateway: EventsGateway,
+    @Inject(forwardRef(() => EventsGateway))
+    private readonly eventsGateway: EventsGateway,
   ) {
     this.instance.key = key;
     this.qrcode = require('qrcode');

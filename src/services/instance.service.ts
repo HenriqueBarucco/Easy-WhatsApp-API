@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { WhatsAppInstance } from 'src/class/WhatsAppInstance';
 import { PrismaService } from './prisma.service';
@@ -8,6 +13,7 @@ import { EventsGateway } from './events.gateway';
 export class InstanceService {
   constructor(
     private prisma: PrismaService,
+    @Inject(forwardRef(() => EventsGateway))
     private eventsGateway: EventsGateway,
   ) {}
   instances = [];

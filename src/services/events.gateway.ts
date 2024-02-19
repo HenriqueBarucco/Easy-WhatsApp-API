@@ -1,10 +1,11 @@
+import { Inject, forwardRef } from '@nestjs/common';
 import {
   WebSocketGateway,
   SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Socket } from 'socket.io';
 import { MessageService } from './message.service';
 
 const options = {
@@ -16,9 +17,9 @@ const options = {
 @WebSocketGateway(options)
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    private readonly io: Server,
+    @Inject(forwardRef(() => MessageService))
     private readonly messageService: MessageService,
-  ) {}
+  ) {} // private readonly messageService: MessageService, // @Inject(forwardRef(() => MessageService)) // private readonly io: Server,
   private connectedClients: Socket[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
