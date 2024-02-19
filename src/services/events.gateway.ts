@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { MessageService } from './message.service';
+import { TokenService } from './token.service';
 
 const options = {
   cors: {
@@ -19,7 +20,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @Inject(forwardRef(() => MessageService))
     private readonly messageService: MessageService,
-  ) {} // private readonly messageService: MessageService, // @Inject(forwardRef(() => MessageService)) // private readonly io: Server,
+    @Inject(forwardRef(() => TokenService))
+    private readonly tokenService: TokenService,
+  ) {}
   private connectedClients: Socket[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -37,14 +40,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.connectedClients = this.connectedClients.filter((c) => c !== client);
   }
 
-  @SubscribeMessage('customEvent')
-  handleCustomEvent(client: Socket, data: any): void {
-    this.connectedClients.forEach((c) => {
-      if (c === client) {
-        c.emit('customEventResponse', data);
-      }
-    });
-  }
+  // @SubscribeMessage('customEvent')
+  // handleCustomEvent(client: Socket, data: any): void {
+  //   this.connectedClients.forEach((c) => {
+  //     if (c === client) {
+  //       c.emit('customEventResponse', data);
+  //     }
+  //   });
+  // }
 
   @SubscribeMessage('message')
   handleMessageEvent(client: Socket, data: any): void {
@@ -56,9 +59,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   emitEvent(key: string, event: string, data?: any): void {
-    this.connectedClients.forEach((c) => {
+    this.connectedClients.forEach(async (c) => {
       if (c.handshake.query.key === key) {
         c.emit(event, data);
+      }
+      const token = await this.tokenService.getByKey(key);
+      if (token != null) {
+        if (c.handshake.query.token === token) {
+          c.emit(event, data);
+        }
       }
     });
   }

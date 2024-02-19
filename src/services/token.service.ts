@@ -44,4 +44,18 @@ export class TokenService {
       message: 'Token deleted successfully',
     };
   }
+
+  async getByKey(key: string): Promise<string | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        key: key,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user.token || null;
+  }
 }
