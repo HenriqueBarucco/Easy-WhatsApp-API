@@ -3,7 +3,7 @@ import makeWASocket, {
   DisconnectReason,
   makeInMemoryStore,
   useMultiFileAuthState,
-} from '@whiskeysockets/baileys';
+} from 'baileys';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EventsGateway } from 'src/services/events.gateway';
@@ -21,15 +21,18 @@ export class WhatsAppInstance {
     auth: null,
   };
   qrcode: any;
-  store = makeInMemoryStore({});
+  store: ReturnType<typeof makeInMemoryStore>;
 
   constructor(
     key: string,
     @Inject(forwardRef(() => EventsGateway))
     private readonly eventsGateway: EventsGateway,
   ) {
+    this.store = makeInMemoryStore({});
+
     this.instance.key = key;
     this.qrcode = require('qrcode');
+
     this.store.readFromFile(`sessions/${this.instance.key}/store.json`);
     setInterval(() => {
       this.store.writeToFile(`sessions/${this.instance.key}/store.json`);
