@@ -57,9 +57,9 @@ export class SendImageDto {
     format: 'binary',
     description: 'Image to upload',
   })
-  file: string;
+  image: string;
 
-  @ApiProperty({ example: 'Caption for the image' })
+  @ApiProperty({ example: 'Caption for the image', required: false })
   @IsOptional()
   caption: string;
 }
