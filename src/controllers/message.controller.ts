@@ -106,16 +106,16 @@ export class MessageController {
     required: false,
   })
   @Post('image')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('image'))
   sendImage(
     @UserRequest() user: SanitizedUser,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File,
     @Body() sendImageDto: SendImageDto,
   ) {
     return this.messageService.sendImage(
       user.key,
       sendImageDto.phone,
-      file,
+      image,
       sendImageDto.caption,
     );
   }
