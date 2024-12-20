@@ -48,6 +48,22 @@ export class SendFileDto {
   file: string;
 }
 
+export class SendImageDto {
+  @ApiProperty({ example: 'Phone Number - 5516990000000' })
+  phone: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Image to upload',
+  })
+  file: string;
+
+  @ApiProperty({ example: 'Caption for the image' })
+  @IsOptional()
+  caption: string;
+}
+
 @ApiBearerAuth()
 @UseGuards(TokenAuthGuard)
 @ApiTags('Message')
@@ -80,5 +96,27 @@ export class MessageController {
     @Body() sendFileDto: SendFileDto,
   ) {
     return this.messageService.sendFile(user.key, sendFileDto.phone, file);
+  }
+
+  @ApiOperation({ summary: 'Send image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiHeader({
+    name: 'Token',
+    description: 'Your personal token (optional)',
+    required: false,
+  })
+  @Post('image')
+  @UseInterceptors(FileInterceptor('file'))
+  sendImage(
+    @UserRequest() user: SanitizedUser,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() sendImageDto: SendImageDto,
+  ) {
+    return this.messageService.sendImage(
+      user.key,
+      sendImageDto.phone,
+      file,
+      sendImageDto.caption,
+    );
   }
 }

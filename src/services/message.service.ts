@@ -54,4 +54,27 @@ export class MessageService {
       message: 'File sent successfully',
     };
   }
+
+  async sendImage(
+    key: string,
+    phone: string,
+    file: Express.Multer.File,
+    caption: string,
+  ): Promise<any> {
+    const instance = this.instanceService.getInstance(key);
+
+    if (!(await instance).instance.online) {
+      throw new NotFoundException('Instance offline');
+    }
+
+    try {
+      await (await instance).sendMediaFile(phone, file, 'image', caption, null);
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+
+    return {
+      message: 'Image sent successfully',
+    };
+  }
 }
