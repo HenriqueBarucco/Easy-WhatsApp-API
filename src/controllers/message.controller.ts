@@ -106,7 +106,13 @@ export class MessageController {
     required: false,
   })
   @Post('image')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: {
+        fileSize: 1024 * 1024 * 50, // 50MB
+      },
+    }),
+  )
   sendImage(
     @UserRequest() user: SanitizedUser,
     @UploadedFile() image: Express.Multer.File,
