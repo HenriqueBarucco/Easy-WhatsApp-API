@@ -57,7 +57,7 @@ export class SendImageDto {
     format: 'binary',
     description: 'Image to upload',
   })
-  image: string;
+  file: string;
 
   @ApiProperty({ example: 'Caption for the image', required: false })
   @IsOptional()
@@ -107,7 +107,7 @@ export class MessageController {
   })
   @Post('image')
   @UseInterceptors(
-    FileInterceptor('image', {
+    FileInterceptor('file', {
       limits: {
         fileSize: 1024 * 1024 * 50, // 50MB
       },
@@ -115,13 +115,13 @@ export class MessageController {
   )
   sendImage(
     @UserRequest() user: SanitizedUser,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
     @Body() sendImageDto: SendImageDto,
   ) {
     return this.messageService.sendImage(
       user.key,
       sendImageDto.phone,
-      image,
+      file,
       sendImageDto.caption,
     );
   }
