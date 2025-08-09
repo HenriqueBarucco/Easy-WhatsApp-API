@@ -1,12 +1,9 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import makeWASocket, {
-  DisconnectReason,
-  makeInMemoryStore,
-  useMultiFileAuthState,
-} from 'baileys';
+import makeWASocket, { DisconnectReason, useMultiFileAuthState } from 'baileys';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EventsGateway } from 'src/services/events.gateway';
+import SimpleStore from './SimpleStore';
 
 @Injectable()
 export class WhatsAppInstance {
@@ -21,14 +18,14 @@ export class WhatsAppInstance {
     auth: null,
   };
   qrcode: any;
-  store: ReturnType<typeof makeInMemoryStore>;
+  store: SimpleStore;
 
   constructor(
     key: string,
     @Inject(forwardRef(() => EventsGateway))
     private readonly eventsGateway: EventsGateway,
   ) {
-    this.store = makeInMemoryStore({});
+    this.store = new SimpleStore();
 
     this.instance.key = key;
     this.qrcode = require('qrcode');
