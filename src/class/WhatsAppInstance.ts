@@ -137,7 +137,8 @@ export class WhatsAppInstance {
 
       try {
         if (type === 'conversation') {
-          console.log(content?.conversation);
+          console.log({ name, phone, message: content?.conversation });
+
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
             phone,
@@ -149,7 +150,12 @@ export class WhatsAppInstance {
         }
 
         if (type === 'extendedTextMessage') {
-          console.log(content?.extendedTextMessage?.text);
+          console.log({
+            name,
+            phone,
+            message: content?.extendedTextMessage?.text,
+          });
+
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
             phone,
@@ -164,6 +170,8 @@ export class WhatsAppInstance {
           const media = content.imageMessage;
           const buffer = await this.downloadMediaBuffer(media, 'image');
           const base64 = buffer.toString('base64');
+
+          console.log({ name, phone, message: base64 });
 
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
