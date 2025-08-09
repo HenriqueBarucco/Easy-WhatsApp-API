@@ -1,5 +1,11 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import makeWASocket, { DisconnectReason, useMultiFileAuthState } from 'baileys';
+import makeWASocket, {
+  DisconnectReason,
+  useMultiFileAuthState,
+  downloadContentFromMessage,
+  getContentType,
+  extractMessageContent,
+} from 'baileys';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EventsGateway } from 'src/services/events.gateway';
@@ -117,16 +123,96 @@ export class WhatsAppInstance {
     });
 
     // When a new message is received
-    sock?.ev.on('messages.upsert', (m: any) => {
-      if (m.messages[0].key.fromMe) return;
+    sock?.ev.on('messages.upsert', async (m: any) => {
+      const msg = m?.messages?.[0];
+      if (!msg || msg.key?.fromMe) return;
 
-      this.eventsGateway.emitEvent(this.instance.key, 'message', {
-        name: m.messages[0].pushName,
-        phone: m.messages[0].key.remoteJid.split('@')[0],
-        message: m.messages[0].message?.conversation,
-        messageTimestamp: m.messages[0].messageTimestamp,
-      });
+      const name = msg.pushName;
+      const phone = (msg.key?.remoteJid || '').split('@')[0];
+      const timestamp = msg.messageTimestamp;
+
+      const content = extractMessageContent(msg.message) || msg.message;
+      const type = getContentType(content);
+      console.log(type);
+
+      try {
+        if (type === 'conversation') {
+          console.log(content?.conversation);
+          this.eventsGateway.emitEvent(this.instance.key, 'message', {
+            name,
+            phone,
+            type: 'text',
+            message: content?.conversation,
+            messageTimestamp: timestamp,
+          });
+          return;
+        }
+
+        if (type === 'extendedTextMessage') {
+          console.log(content?.extendedTextMessage?.text);
+          this.eventsGateway.emitEvent(this.instance.key, 'message', {
+            name,
+            phone,
+            type: 'text',
+            message: content?.extendedTextMessage?.text,
+            messageTimestamp: timestamp,
+          });
+          return;
+        }
+
+        if (type === 'imageMessage') {
+          const media = content.imageMessage;
+          const buffer = await this.downloadMediaBuffer(media, 'image');
+          const base64 = buffer.toString('base64');
+
+          this.eventsGateway.emitEvent(this.instance.key, 'message', {
+            name,
+            phone,
+            type: 'image',
+            mimetype: media?.mimetype || 'image/jpeg',
+            caption: media?.caption || undefined,
+            data: base64,
+            messageTimestamp: timestamp,
+          });
+          return;
+        }
+
+        this.eventsGateway.emitEvent(this.instance.key, 'message', {
+          name,
+          phone,
+          type: type || 'unknown',
+          messageTimestamp: timestamp,
+        });
+      } catch (err) {
+        this.eventsGateway.emitEvent(this.instance.key, 'message', {
+          name,
+          phone,
+          type: type || 'unknown',
+          error: 'failed_to_process_message',
+          messageTimestamp: timestamp,
+        });
+      }
     });
+  }
+
+  private async downloadMediaBuffer(
+    mediaMessage: any,
+    mediaType: 'image' | 'video' | 'audio' | 'document' | 'sticker',
+  ): Promise<Buffer> {
+    const stream = await downloadContentFromMessage(mediaMessage, mediaType);
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of stream as AsyncIterable<Uint8Array>) {
+      chunks.push(chunk);
+    }
+    const buffers = chunks.map((c) => new Uint8Array(c));
+    const total = buffers.reduce((sum, b) => sum + b.length, 0);
+    const out = Buffer.alloc(total);
+    let offset = 0;
+    for (const b of buffers) {
+      out.set(b, offset);
+      offset += b.length;
+    }
+    return out;
   }
 
   deleteFolderRecursive(folderPath: string) {
