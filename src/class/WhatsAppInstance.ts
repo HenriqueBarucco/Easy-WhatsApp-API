@@ -127,9 +127,17 @@ export class WhatsAppInstance {
       const msg = m?.messages?.[0];
       if (!msg || msg.key?.fromMe) return;
 
+      const remoteJid = msg.key?.remoteJid || '';
+      const participant = msg.key?.participant as string | undefined;
+      const isGroup = remoteJid.endsWith('@g.us');
+
       const name = msg.pushName;
-      const phone = (msg.key?.remoteJid || '').split('@')[0];
+      const phone =
+        ((isGroup ? participant : remoteJid) || '').split('@')[0] || null;
+      const group = isGroup ? remoteJid : null;
       const timestamp = msg.messageTimestamp;
+
+      console.log({ phone, group, isGroup });
 
       const content = extractMessageContent(msg.message) || msg.message;
       const type = getContentType(content);
@@ -142,6 +150,7 @@ export class WhatsAppInstance {
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
             phone,
+            group,
             type: 'text',
             message: content?.conversation,
             messageTimestamp: timestamp,
@@ -159,6 +168,7 @@ export class WhatsAppInstance {
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
             phone,
+            group,
             type: 'text',
             message: content?.extendedTextMessage?.text,
             messageTimestamp: timestamp,
@@ -176,6 +186,7 @@ export class WhatsAppInstance {
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
             phone,
+            group,
             type: 'image',
             mimetype: media?.mimetype || 'image/jpeg',
             caption: media?.caption || undefined,
@@ -188,6 +199,7 @@ export class WhatsAppInstance {
         this.eventsGateway.emitEvent(this.instance.key, 'message', {
           name,
           phone,
+          group,
           type: type || 'unknown',
           messageTimestamp: timestamp,
         });
@@ -195,6 +207,7 @@ export class WhatsAppInstance {
         this.eventsGateway.emitEvent(this.instance.key, 'message', {
           name,
           phone,
+          group,
           type: type || 'unknown',
           error: 'failed_to_process_message',
           messageTimestamp: timestamp,
