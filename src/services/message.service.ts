@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
@@ -75,6 +76,44 @@ export class MessageService {
 
     return {
       message: 'Image sent successfully',
+    };
+  }
+
+  async sendLocation(
+    key: string,
+    phone: string,
+    latitude: number,
+    longitude: number,
+    locationName?: string,
+    address?: string,
+  ): Promise<any> {
+    const instance = await this.instanceService.getInstance(key);
+
+    if (!instance.instance.online) {
+      throw new NotFoundException('Instance offline');
+    }
+
+    const parsedLatitude = Number(latitude);
+    const parsedLongitude = Number(longitude);
+
+    if (Number.isNaN(parsedLatitude) || Number.isNaN(parsedLongitude)) {
+      throw new BadRequestException('Invalid latitude or longitude');
+    }
+
+    try {
+      await instance.sendLocationMessage(
+        phone,
+        parsedLatitude,
+        parsedLongitude,
+        locationName,
+        address,
+      );
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+
+    return {
+      message: 'Location sent successfully',
     };
   }
 }

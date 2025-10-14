@@ -295,6 +295,41 @@ export class WhatsAppInstance {
     return data;
   }
 
+  async sendLocationMessage(
+    phone: string,
+    latitude: number,
+    longitude: number,
+    locationName?: string,
+    address?: string,
+  ) {
+    await this.verifyId(this.getWhatsAppId(phone));
+    const locationPayload: {
+      degreesLatitude: number;
+      degreesLongitude: number;
+      name?: string;
+      address?: string;
+    } = {
+      degreesLatitude: latitude,
+      degreesLongitude: longitude,
+    };
+
+    if (locationName) {
+      locationPayload.name = locationName;
+    }
+
+    if (address) {
+      locationPayload.address = address;
+    }
+
+    const data = await this.instance.sock?.sendMessage(
+      this.getWhatsAppId(phone),
+      {
+        location: locationPayload,
+      },
+    );
+    return data;
+  }
+
   async getInstanceDetails() {
     return {
       instance_key: this.instance.key,
