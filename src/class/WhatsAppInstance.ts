@@ -56,6 +56,7 @@ export class WhatsAppInstance {
       auth: {
         ...state,
       },
+      version: [2, 3000, 1027934701],
     });
 
     this.instance = {
