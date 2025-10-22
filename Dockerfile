@@ -16,6 +16,7 @@ FROM node:20
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 8080
-CMD [ "npm", "run", "start:prod" ]
+CMD [ "sh", "-c", "npm run prisma:deploy && npm run start:prod" ]
