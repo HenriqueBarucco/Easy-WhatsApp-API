@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -20,7 +20,7 @@ model User {
   token    String?    @unique
   Instance Instance[]
 
-  @@map("users_tbl")
+  @@map("users")
 }
 
 model Instance {
@@ -28,5 +28,5 @@ model Instance {
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
 
-  @@map("instances_tbl")
+  @@map("instances")
 }
