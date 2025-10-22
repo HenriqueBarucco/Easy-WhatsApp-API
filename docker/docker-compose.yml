@@ -1,13 +1,15 @@
 services:
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: 'easy-whatsapp'
-      MYSQL_ROOT_PASSWORD: 'root'
+  postgres:
+    container_name: postgres_easy_whatsapp_api
+    image: postgres:17-alpine
     ports:
-      - '3306:3306'
+      - "5432:5432"
     volumes:
-      - easy-db:/var/lib/mysql
+      - easy-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=usr_easy_whatsapp_api
+      - POSTGRES_PASSWORD=easy_whatsapp_api
+      - POSTGRES_DB=easy-whatsapp
 
 volumes:
   easy-db:
