@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { InstanceService } from './instance.service';
 
 @Injectable()
 export class MessageService {
+  private readonly logger = new Logger(MessageService.name);
   constructor(
     @Inject(forwardRef(() => InstanceService))
     private instanceService: InstanceService,
@@ -43,7 +45,13 @@ export class MessageService {
       throw new NotFoundException('Instance offline');
     }
 
-    console.log(file);
+    this.logger.debug(
+      `Sending file ${JSON.stringify({
+        originalname: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+      })}`,
+    );
 
     try {
       await (await instance).sendMediaFile(phone, file, 'document', '', '');

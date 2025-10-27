@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
@@ -13,6 +13,7 @@ import SimpleStore from './SimpleStore';
 
 @Injectable()
 export class WhatsAppInstance {
+  private readonly logger = new Logger(WhatsAppInstance.name);
   instance = {
     key: '',
     qr: '',
@@ -138,15 +139,23 @@ export class WhatsAppInstance {
       const group = isGroup ? remoteJid : null;
       const timestamp = msg.messageTimestamp;
 
-      console.log({ phone, group, isGroup });
+      this.logger.debug(
+        `Incoming message source ${JSON.stringify({ phone, group, isGroup })}`,
+      );
 
       const content = extractMessageContent(msg.message) || msg.message;
       const type = getContentType(content);
-      console.log(type);
+      this.logger.debug(`Detected message type ${type}`);
 
       try {
         if (type === 'conversation') {
-          console.log({ name, phone, message: content?.conversation });
+          this.logger.debug(
+            `Conversation payload ${JSON.stringify({
+              name,
+              phone,
+              message: content?.conversation,
+            })}`,
+          );
 
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
@@ -160,11 +169,13 @@ export class WhatsAppInstance {
         }
 
         if (type === 'extendedTextMessage') {
-          console.log({
-            name,
-            phone,
-            message: content?.extendedTextMessage?.text,
-          });
+          this.logger.debug(
+            `Extended text payload ${JSON.stringify({
+              name,
+              phone,
+              message: content?.extendedTextMessage?.text,
+            })}`,
+          );
 
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,
@@ -182,7 +193,9 @@ export class WhatsAppInstance {
           const buffer = await this.downloadMediaBuffer(media, 'image');
           const base64 = buffer.toString('base64');
 
-          console.log({ name, phone, message: base64 });
+          this.logger.debug(
+            `Image payload ${JSON.stringify({ name, phone, message: base64 })}`,
+          );
 
           this.eventsGateway.emitEvent(this.instance.key, 'message', {
             name,

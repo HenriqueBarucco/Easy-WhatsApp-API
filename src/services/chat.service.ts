@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 
 @Injectable()
 export class ChatService {
+  private readonly logger = new Logger(ChatService.name);
   constructor(private instanceService: InstanceService) {}
 
   async chat(key: string): Promise<any> {
@@ -30,7 +31,9 @@ export class ChatService {
           !contact.id.includes('status') &&
           !contact.id.includes(phone)
         ) {
-          console.log(contacts[contact.id]);
+          this.logger.debug(
+            `Recent contact ${JSON.stringify(contacts[contact.id])}`,
+          );
           return {
             phone: contact.id.split('@')[0],
             name:

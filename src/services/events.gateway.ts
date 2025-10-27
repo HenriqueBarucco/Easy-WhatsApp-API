@@ -1,4 +1,4 @@
-import { Inject, forwardRef } from '@nestjs/common';
+import { Inject, Logger, forwardRef } from '@nestjs/common';
 import {
   WebSocketGateway,
   SubscribeMessage,
@@ -17,6 +17,7 @@ const options = {
 };
 @WebSocketGateway(options)
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(EventsGateway.name);
   constructor(
     @Inject(forwardRef(() => MessageService))
     private readonly messageService: MessageService,
@@ -27,11 +28,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(
-      'Client connected',
-      client.handshake.query.key || client.handshake.query.token,
-      'Id:',
-      client.id,
+    const identifier =
+      client.handshake.query.key || client.handshake.query.token;
+    this.logger.log(
+      `Client connected ${identifier} Id: ${client.id}`,
     );
     this.connectedClients.push(client);
   }
