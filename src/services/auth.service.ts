@@ -8,7 +8,7 @@ import { User } from '@prisma/client';
 import { UsersService } from './users.service';
 import { SignUpDto } from 'src/controllers/auth.controller';
 import { InstanceService } from './instance.service';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
