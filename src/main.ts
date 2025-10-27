@@ -5,9 +5,12 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/app.module';
 import { InstanceService } from './services/instance.service';
 import * as bodyParser from 'body-parser';
+import { createAppLogger } from './utils/logger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: createAppLogger(),
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Easy WhatsApp Bot API')
