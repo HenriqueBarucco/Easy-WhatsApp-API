@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { version } from '../package.json';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/app.module';
 import { InstanceService } from './services/instance.service';
 import * as bodyParser from 'body-parser';
 import { createAppLogger } from './utils/logger';
+import { getAppVersion } from './utils/app-info';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,7 +20,7 @@ async function bootstrap() {
       'https://github.com/henriquebarucco',
       'contato@henriquebarucco.com.br',
     )
-    .setVersion(version)
+    .setVersion(getAppVersion())
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);

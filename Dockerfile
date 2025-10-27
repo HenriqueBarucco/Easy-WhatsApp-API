@@ -25,4 +25,4 @@ EXPOSE 8080
 
 RUN npx prisma generate
 
-CMD ["node", "-r", "@opentelemetry/auto-instrumentations-node/register", "dist/src/main.js"]
+CMD ["node", "-r", "@opentelemetry/auto-instrumentations-node/register", "dist/main.js"]

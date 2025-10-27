@@ -1,6 +1,6 @@
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { HealthService } from 'src/services/health.service';
-import { version } from '../../package.json';
+import { getAppVersion } from 'src/utils/app-info';
 
 @Controller('health')
 export class HealthController {
@@ -13,13 +13,13 @@ export class HealthController {
     if (health.status === 'error') {
       throw new ServiceUnavailableException({
         ...health,
-        version,
+        version: getAppVersion(),
       });
     }
 
     return {
       ...health,
-      version,
+      version: getAppVersion(),
     };
   }
 }
