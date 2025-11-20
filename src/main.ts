@@ -26,6 +26,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
 
+  const swaggerJsonPath = '/swagger.json';
+  app.getHttpAdapter().get(swaggerJsonPath, (_req, res) => res.json(document));
+
   app.enableCors();
   app.get(InstanceService).restoreSessions();
 
