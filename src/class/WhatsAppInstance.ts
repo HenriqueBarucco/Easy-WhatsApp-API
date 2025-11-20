@@ -3,7 +3,6 @@ import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
   downloadContentFromMessage,
-  getContentType,
   extractMessageContent,
 } from 'baileys';
 import * as fs from 'fs';
@@ -144,7 +143,7 @@ export class WhatsAppInstance {
       );
 
       const content = extractMessageContent(msg.message) || msg.message;
-      const type = getContentType(content);
+      const type = this.resolveMessageType(content);
       this.logger.debug(`Detected message type ${type}`);
 
       try {
@@ -210,24 +209,162 @@ export class WhatsAppInstance {
           return;
         }
 
+        const fallbackMessage = this.extractFallbackMessage(type, content);
         this.eventsGateway.emitEvent(this.instance.key, 'message', {
           name,
           phone,
           group,
           type: type || 'unknown',
+          message: fallbackMessage,
           messageTimestamp: timestamp,
         });
       } catch (err) {
+        const fallbackMessage = this.extractFallbackMessage(type, content);
         this.eventsGateway.emitEvent(this.instance.key, 'message', {
           name,
           phone,
           group,
           type: type || 'unknown',
+          message: fallbackMessage,
           error: 'failed_to_process_message',
           messageTimestamp: timestamp,
         });
       }
     });
+  }
+
+  private extractFallbackMessage(
+    type: string | undefined,
+    content: any,
+  ): string | undefined {
+    if (!content) return undefined;
+    if (typeof content === 'string') return content;
+
+    const getString = (value: any): string | undefined => {
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value;
+      }
+      return undefined;
+    };
+
+    const handlers: Record<string, (payload: any) => string | undefined> = {
+      conversation: (payload) => getString(payload?.conversation),
+      extendedTextMessage: (payload) =>
+        getString(payload?.extendedTextMessage?.text) ||
+        getString(payload?.text),
+      buttonsResponseMessage: (payload) =>
+        getString(payload?.buttonsResponseMessage?.selectedDisplayText) ||
+        getString(payload?.buttonsResponseMessage?.selectedButtonId),
+      templateButtonReplyMessage: (payload) =>
+        getString(payload?.templateButtonReplyMessage?.selectedDisplayText) ||
+        getString(payload?.templateButtonReplyMessage?.selectedId),
+      listResponseMessage: (payload) =>
+        getString(
+          payload?.listResponseMessage?.singleSelectReply
+            ?.selectedRowDescription,
+        ) ||
+        getString(
+          payload?.listResponseMessage?.singleSelectReply?.selectedRowId,
+        ) ||
+        getString(payload?.listResponseMessage?.title),
+      interactiveResponseMessage: (payload) =>
+        getString(payload?.interactiveResponseMessage?.body?.text) ||
+        getString(
+          payload?.interactiveResponseMessage?.nativeFlowResponseMessage
+            ?.paramsJson,
+        ),
+      interactiveMessage: (payload) =>
+        getString(payload?.interactiveMessage?.body?.text) ||
+        getString(payload?.interactiveMessage?.footer?.text),
+      buttonsMessage: (payload) =>
+        getString(payload?.buttonsMessage?.contentText),
+      pollCreationMessage: (payload) =>
+        getString(payload?.pollCreationMessage?.name),
+      pollUpdateMessage: (payload) =>
+        getString(payload?.pollUpdateMessage?.vote?.[0]?.optionName),
+      reactionMessage: (payload) => getString(payload?.reactionMessage?.text),
+      imageMessage: (payload) => getString(payload?.imageMessage?.caption),
+      videoMessage: (payload) => getString(payload?.videoMessage?.caption),
+      documentMessage: (payload) =>
+        getString(payload?.documentMessage?.caption) ||
+        getString(payload?.documentMessage?.title),
+      documentWithCaptionMessage: (payload) =>
+        getString(
+          payload?.documentWithCaptionMessage?.message?.documentMessage
+            ?.caption,
+        ),
+    };
+
+    if (type && handlers[type]) {
+      const handled = handlers[type](content);
+      if (handled) return handled;
+    }
+
+    const sources = [] as any[];
+    if (type && Object.prototype.hasOwnProperty.call(content, type)) {
+      sources.push(content[type]);
+    }
+    sources.push(content);
+
+    for (const src of sources) {
+      if (!src || typeof src !== 'object') continue;
+      const direct =
+        getString(src.text) ||
+        getString(src.caption) ||
+        getString(src.contentText) ||
+        getString(src.body?.text);
+      if (direct) return direct;
+    }
+
+    return undefined;
+  }
+
+  private resolveMessageType(content: any): string | undefined {
+    if (!content || typeof content !== 'object') return undefined;
+
+    const prioritizedKeys = [
+      'conversation',
+      'extendedTextMessage',
+      'imageMessage',
+      'videoMessage',
+      'audioMessage',
+      'documentMessage',
+      'documentWithCaptionMessage',
+      'stickerMessage',
+      'locationMessage',
+      'liveLocationMessage',
+      'contactMessage',
+      'contactsArrayMessage',
+      'buttonsMessage',
+      'buttonsResponseMessage',
+      'templateButtonReplyMessage',
+      'listMessage',
+      'listResponseMessage',
+      'interactiveMessage',
+      'interactiveResponseMessage',
+      'pollCreationMessage',
+      'pollUpdateMessage',
+      'reactionMessage',
+      'protocolMessage',
+    ];
+
+    for (const key of prioritizedKeys) {
+      if (Object.prototype.hasOwnProperty.call(content, key)) return key;
+    }
+
+    const ignoredKeys = new Set([
+      'senderKeyDistributionMessage',
+      'messageContextInfo',
+      'deviceListMetadata',
+      'deviceListMetadataVersion',
+    ]);
+
+    const keys = Object.keys(content);
+    for (const key of keys) {
+      if (!ignoredKeys.has(key)) return key;
+    }
+
+    return keys[0];
   }
 
   private async downloadMediaBuffer(
