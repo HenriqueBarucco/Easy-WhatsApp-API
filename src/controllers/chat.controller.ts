@@ -33,4 +33,10 @@ export class ChatController {
   contactPicture(@Request() req: any, @Query('phone') phone: string) {
     return this.chatService.contactPicture(req.user.key, phone);
   }
+
+  @ApiOperation({ summary: 'Get all your groups' })
+  @Get('groups')
+  groups(@Request() req: any) {
+    return this.chatService.groups(req.user.key);
+  }
 }

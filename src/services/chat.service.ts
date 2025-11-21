@@ -25,22 +25,24 @@ export class ChatService {
     )[0];
 
     const contactsWithPictures = await Promise.all(
-      chats.map(async (contact) => {
+      chats.map(async (chat) => {
         if (
-          contact.unreadCount >= 0 &&
-          !contact.id.includes('status') &&
-          !contact.id.includes(phone)
+          chat.id &&
+          !chat.id.includes('@g.us') &&
+          !chat.id.includes('status') &&
+          !chat.id.includes(phone)
         ) {
-          this.logger.debug(
-            `Recent contact ${JSON.stringify(contacts[contact.id])}`,
-          );
+          const contactInfo = contacts[chat.id];
+          this.logger.debug(`Recent contact ${JSON.stringify(contactInfo)}`);
           return {
-            phone: contact.id.split('@')[0],
+            id: chat.id,
+            phone: chat.id.split('@')[0],
             name:
-              contacts[contact.id]?.name ||
-              contacts[contact.id]?.notify ||
-              contact.id.split('@')[0],
-            picture: await (await instance).getProfilePicture(contact.id),
+              contactInfo?.name ||
+              contactInfo?.notify ||
+              chat.name ||
+              chat.id.split('@')[0],
+            picture: await (await instance).getProfilePicture(chat.id),
           };
         }
       }),
@@ -61,14 +63,37 @@ export class ChatService {
     const contactsWithPictures = [];
 
     for (const contact of Object.values(contacts) as any) {
-      contactsWithPictures.push({
-        phone: contact.id.split('@')[0],
-        notify: contact.notify,
-        name: contact.name,
-        picture: await (await instance).getProfilePicture(contact.id),
-      });
+      if (contact?.id && !contact.id.includes('@g.us')) {
+        contactsWithPictures.push({
+          id: contact.id,
+          phone: contact.id.split('@')[0],
+          notify: contact.notify,
+          name: contact.name || contact.notify || contact.id.split('@')[0],
+          picture: await (await instance).getProfilePicture(contact.id),
+        });
+      }
     }
     return contactsWithPictures;
+  }
+
+  async groups(key: string): Promise<any[]> {
+    const instance = this.instanceService.getInstance(key);
+
+    const chats = (await instance).instance.chats;
+
+    const groupsWithPictures = await Promise.all(
+      chats
+        .filter((chat) => chat.id && chat.id.includes('@g.us'))
+        .map(async (group) => {
+          return {
+            id: group.id,
+            name: group.name || group.id.split('@')[0],
+            picture: await (await instance).getProfilePicture(group.id),
+          };
+        }),
+    );
+
+    return groupsWithPictures;
   }
 
   private processObject(inputObject) {
