@@ -1,7 +1,0 @@
-{
-  "name": "zeptomatch",
-  "version": "0.0.0-custom",
-  "description": "Minimal CommonJS glob matcher used as a drop-in replacement for the ESM-only zeptomatch release.",
-  "main": "index.js",
-  "type": "commonjs"
-}

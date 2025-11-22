@@ -45,7 +45,7 @@
     "class-validator": "^0.14.1",
     "link-preview": "^1.0.0",
     "lodash": "^4.17.21",
-    "multer": "1.4.5-lts.1",
+    "multer": "2.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
@@ -99,10 +99,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "pnpm": {
-    "overrides": {
-      "zeptomatch": "link:./vendor/zeptomatch"
-    }
   }
 }
