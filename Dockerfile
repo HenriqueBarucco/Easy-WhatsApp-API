@@ -1,4 +1,5 @@
 ARG PNPM_VERSION=9.12.3
+ARG PRISMA_VERSION=5.18.0
 
 FROM node:22-slim AS base
 
@@ -27,6 +28,8 @@ RUN pnpm prune --prod
 FROM base AS runner
 
 ENV NODE_ENV=production
+
+RUN npm install -g prisma@${PRISMA_VERSION}
 
 COPY package.json pnpm-lock.yaml ./
 COPY --from=build /app/node_modules ./node_modules
