@@ -67,7 +67,7 @@ export class MessageService {
   async sendImage(
     key: string,
     phone: string,
-    file: Express.Multer.File,
+    file: Pick<Express.Multer.File, 'buffer' | 'mimetype' | 'originalname'>,
     caption: string,
   ): Promise<any> {
     const instance = this.instanceService.getInstance(key);

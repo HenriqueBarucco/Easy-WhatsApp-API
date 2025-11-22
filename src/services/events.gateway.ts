@@ -30,9 +30,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket, ...args: any[]) {
     const identifier =
       client.handshake.query.key || client.handshake.query.token;
-    this.logger.log(
-      `Client connected ${identifier} Id: ${client.id}`,
-    );
+    this.logger.log(`Client connected ${identifier} Id: ${client.id}`);
     this.connectedClients.push(client);
   }
 
@@ -40,24 +38,68 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.connectedClients = this.connectedClients.filter((c) => c !== client);
   }
 
-  // @SubscribeMessage('customEvent')
-  // handleCustomEvent(client: Socket, data: any): void {
-  //   this.connectedClients.forEach((c) => {
-  //     if (c === client) {
-  //       c.emit('customEventResponse', data);
-  //     }
-  //   });
-  // }
-
   @SubscribeMessage('message')
-  async handleMessageEvent(client: Socket, data: any): Promise<void> {
+  async handleMessageEvent(
+    client: Socket,
+    data: {
+      phone: string;
+      message?: string;
+      type?: string;
+      file?: { data: string; filename?: string; mimetype?: string };
+    },
+  ): Promise<void> {
     const key = await this.tokenService.getKeyByToken(
       Array.isArray(client.handshake.query.token)
         ? client.handshake.query.token[0]
         : client.handshake.query.token,
     );
-    if (key != null) {
-      await this.messageService.sendText(key, data.phone, data.message);
+    if (key == null) {
+      this.logger.warn(
+        `Unable to resolve key for websocket client ${client.id}; ignoring message event`,
+      );
+      return;
+    }
+
+    if (data.type === 'image') {
+      const file = this.convertBase64ToFile(data.file);
+      if (!file) {
+        this.logger.warn(
+          `Image payload missing file data for client ${client.id}; skipping send`,
+        );
+        return;
+      }
+      await this.messageService.sendImage(
+        key,
+        data.phone,
+        file,
+        data.message ?? '',
+      );
+      return;
+    }
+
+    await this.messageService.sendText(key, data.phone, data.message ?? '');
+  }
+
+  private convertBase64ToFile(file?: {
+    data?: string;
+    filename?: string;
+    mimetype?: string;
+  }): { buffer: Buffer; mimetype: string; originalname: string } | null {
+    if (!file?.data) return null;
+
+    const dataUrlParts = file.data.match(/^data:(.+);base64,(.*)$/);
+    const base64Payload = dataUrlParts ? dataUrlParts[2] : file.data;
+
+    try {
+      const buffer = Buffer.from(base64Payload, 'base64');
+      if (!buffer.length) return null;
+      const mimetype =
+        file.mimetype ?? dataUrlParts?.[1] ?? 'application/octet-stream';
+      const originalname = file.filename ?? `socket-image-${Date.now()}`;
+      return { buffer, mimetype, originalname };
+    } catch (error) {
+      this.logger.error('Failed to parse base64 image payload', error as Error);
+      return null;
     }
   }
 
