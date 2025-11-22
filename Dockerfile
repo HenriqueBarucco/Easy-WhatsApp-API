@@ -1,10 +1,12 @@
-FROM node:22.3.0 AS base
+ARG PNPM_VERSION=9.12.3
+
+FROM node:22-slim AS base
 
 WORKDIR /app
-ENV PNPM_HOME=/usr/local/share/pnpm
+ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN corepack enable
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 FROM base AS deps
 
@@ -12,25 +14,25 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile --shamefully-hoist
 
-FROM deps AS builder
+FROM base AS build
 
-COPY nest-cli.json tsconfig.json tsconfig.build.json ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json pnpm-lock.yaml nest-cli.json tsconfig.json tsconfig.build.json ./
 COPY prisma ./prisma
 COPY src ./src
 
 RUN pnpm run build
 RUN pnpm prune --prod
 
-FROM node:22.3.0 AS runner
+FROM base AS runner
 
 ENV NODE_ENV=production
-WORKDIR /app
 
-COPY package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
+COPY package.json pnpm-lock.yaml ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
 
 EXPOSE 8080
 
-CMD ["node", "-r", "@opentelemetry/auto-instrumentations-node/register", "dist/main.js"]
+CMD ["sh", "-c", "pnpm prisma:deploy && node -r @opentelemetry/auto-instrumentations-node/register dist/main.js"]
