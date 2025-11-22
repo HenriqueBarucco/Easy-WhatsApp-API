@@ -42,6 +42,7 @@
     "body-parser": "^1.20.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "link-preview": "^1.0.0",
     "lodash": "^4.17.21",
     "multer": "1.4.5-lts.1",
     "passport": "^0.7.0",

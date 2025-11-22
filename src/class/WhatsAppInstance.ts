@@ -53,6 +53,8 @@ export class WhatsAppInstance {
       markOnlineOnConnect: true,
       defaultQueryTimeoutMs: 60000,
       syncFullHistory: false,
+      generateHighQualityLinkPreview: true,
+      linkPreviewImageThumbnailWidth: 192,
       auth: {
         ...state,
       },
