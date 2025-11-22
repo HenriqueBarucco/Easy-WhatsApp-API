@@ -416,12 +416,19 @@ export class WhatsAppInstance {
   }
 
   async sendTextMessage(phone: string, message: string) {
-    await this.verifyId(this.getWhatsAppId(phone));
+    const whatsappId = this.getWhatsAppId(phone);
+    await this.verifyId(whatsappId);
+
+    const options = this.containsUrl(message)
+      ? { linkPreview: true }
+      : undefined;
+
     const data = await this.instance.sock?.sendMessage(
-      this.getWhatsAppId(phone),
+      whatsappId,
       {
         text: message,
       },
+      options,
     );
     return data;
   }
@@ -505,5 +512,12 @@ export class WhatsAppInstance {
     } catch (error) {
       // TODO : Handle error SE QUISER
     }
+  }
+
+  private containsUrl(payload?: string): boolean {
+    if (!payload) return false;
+    const urlPattern =
+      /https?:\/\/(?:www\.)?[\w.-]+(?:\.[\w\.-]+)+(?:[\w\-._~:/?#@!$&'()*+,;=%]*)/i;
+    return urlPattern.test(payload);
   }
 }
