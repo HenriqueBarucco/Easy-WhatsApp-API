@@ -7,6 +7,10 @@ WORKDIR /app
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
+RUN apt-get update -y \
+	&& apt-get install -y openssl \
+	&& rm -rf /var/lib/apt/lists/*
+
 RUN npm install -g pnpm@${PNPM_VERSION}
 
 FROM base AS deps
