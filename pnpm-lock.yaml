@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  zeptomatch: link:./vendor/zeptomatch
+
 importers:
 
   .:
@@ -111,6 +114,9 @@ importers:
       '@nestjs/testing':
         specifier: ^10.4.1
         version: 10.4.20(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.20)(@nestjs/platform-express@10.4.20)
+      '@prisma/config':
+        specifier: ^7.0.0
+        version: 7.0.0
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
@@ -2837,9 +2843,6 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  grammex@3.1.11:
-    resolution: {integrity: sha512-HNwLkgRg9SqTAd1N3Uh/MnKwTBTzwBxTOPbXQ8pb0tpwydjk90k4zRE8JUn9fMUiRwKtXFZ1TWFmms3dZHN+Fg==}
-
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
@@ -4593,9 +4596,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zeptomatch@2.0.2:
-    resolution: {integrity: sha512-H33jtSKf8Ijtb5BW6wua3G5DhnFjbFML36eFu+VdOoVY4HD9e7ggjqdM6639B+L87rjnR6Y+XeRzBXZdy52B/g==}
-
 snapshots:
 
   '@angular-devkit/core@17.3.11(chokidar@3.6.0)':
@@ -6191,7 +6191,7 @@ snapshots:
       remeda: 2.21.3
       std-env: 3.9.0
       valibot: 1.1.0(typescript@5.9.3)
-      zeptomatch: 2.0.2
+      zeptomatch: link:vendor/zeptomatch
     transitivePeerDependencies:
       - typescript
 
@@ -7861,8 +7861,6 @@ snapshots:
   gopd@1.2.0: {}
 
   graceful-fs@4.2.11: {}
-
-  grammex@3.1.11: {}
 
   graphemer@1.4.0: {}
 
@@ -9832,7 +9830,3 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
-
-  zeptomatch@2.0.2:
-    dependencies:
-      grammex: 3.1.11

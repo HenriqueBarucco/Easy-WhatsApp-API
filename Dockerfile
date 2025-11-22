@@ -31,8 +31,7 @@ ENV NODE_ENV=production
 
 RUN npm install -g prisma@${PRISMA_VERSION}
 
-COPY package.json pnpm-lock.yaml ./
-COPY prisma.config.ts ./
+COPY package.json pnpm-lock.yaml prisma.config.ts ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
