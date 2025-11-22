@@ -24,12 +24,8 @@ export class SimpleStore {
 
   bind(ev: BaileysEventEmitter) {
     ev.on('messaging-history.set', ({ chats, contacts, messages }: any) => {
-      if (Array.isArray(chats)) this.chatsArr = [...chats];
-      if (Array.isArray(contacts)) {
-        for (const c of contacts) {
-          if (c?.id) this.contactsMap[c.id] = c;
-        }
-      }
+      if (Array.isArray(chats)) this.replaceArray(this.chatsArr, chats);
+      if (Array.isArray(contacts)) this.replaceContacts(contacts);
       if (Array.isArray(messages)) {
         for (const m of messages) this.addMessage(m);
       }
@@ -61,11 +57,12 @@ export class SimpleStore {
       const raw = fs.readFileSync(filePath, 'utf-8');
       if (!raw) return;
       const data = JSON.parse(raw);
-      if (Array.isArray(data.chats)) this.chatsArr = data.chats;
+      if (Array.isArray(data.chats))
+        this.replaceArray(this.chatsArr, data.chats);
       if (data.messages && typeof data.messages === 'object')
-        this.messagesMap = data.messages;
+        this.replaceMap(this.messagesMap, data.messages);
       if (data.contacts && typeof data.contacts === 'object')
-        this.contactsMap = data.contacts;
+        this.replaceMap(this.contactsMap, data.contacts);
     } catch (_e) {
       // ignore corrupt files
     }
@@ -91,6 +88,22 @@ export class SimpleStore {
     if (!jid) return;
     if (!this.messagesMap[jid]) this.messagesMap[jid] = [];
     this.messagesMap[jid].push(m);
+  }
+
+  private replaceArray(target: any[], source: any[]) {
+    target.length = 0;
+    target.push(...source);
+  }
+
+  private replaceContacts(contacts: any[]) {
+    for (const key of Object.keys(this.contactsMap))
+      delete this.contactsMap[key];
+    for (const c of contacts) if (c?.id) this.contactsMap[c.id] = c;
+  }
+
+  private replaceMap(target: Record<string, any>, source: Record<string, any>) {
+    for (const key of Object.keys(target)) delete target[key];
+    Object.assign(target, source);
   }
 }
 
